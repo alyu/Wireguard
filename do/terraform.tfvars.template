@@ -1,0 +1,15 @@
+pub_key         = "keys/id_rsa.pub"
+pvt_key         = "keys/id_rsa"
+ssh_fingerprint = "<digitalocean ssh fingerprint>"
+ssh_username    = "root"
+region          = "sgp1"
+vpc_name        = "wireguard-vpc"
+vpc_ip_range    = "10.10.10.0/24"
+vpc_description = "wireguard vpc network"
+do_token        = "<digitalocean api token>"
+droplet_name    = "wireguard-vpn"
+droplet_image   = "ubuntu-20-04-x64"
+cloud_init_file = "./scripts/cloud-config.yaml"
+droplet_size    = "s-1vcpu-1gb"
+droplet_tags    = ["wireguard-vpn", "terraform", "wireguard-server"]
+
