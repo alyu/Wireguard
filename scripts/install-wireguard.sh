@@ -7,8 +7,36 @@ ask() {
   return 1
 }
 
+checkLock() {
+    if command -v fuser >/dev/null 2>/dev/null; then
+        fuser $@ 2>/dev/null >/dev/null
+        return $?
+    fi
+    # fuser (psmisc) not installed, go with lsof
+    if [ "`lsof $@ 2>/dev/null >/dev/null`x" != "x" ]; then
+        return 0
+    fi
+    return 1
+}
+
+waitForLocks() {
+    if checkLock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock /var/cache/apt/archives/lock; then
+        echo -n "=> Waiting for APT/DPKG locks."
+    else
+        return
+    fi
+    while checkLock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock /var/cache/apt/archives/lock; do
+        echo -n .
+        sleep 1
+    done
+    echo .
+}
+
 installWireGuard() {
-  apt update && apt upgrade -y && apt install -y wireguard wireguard-tools
+  waitForLocks
+  apt update \
+    && DEBIAN_FRONTEND=noninteractive apt upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
+    && DEBIAN_FRONTEND=noninteractive apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" wireguard wireguard-tools
 }
 
 installServer() {

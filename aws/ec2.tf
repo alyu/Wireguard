@@ -55,6 +55,7 @@ resource "aws_instance" "wireguard-vpn" {
   # install and setup wireguard
   provisioner "remote-exec" {
     inline = [
+      "echo 'Waiting to boot up ...' && sleep 20",
       "chmod +x /tmp/wireguard/install-wireguard.sh",
       "sudo bash -c '/tmp/wireguard/install-wireguard.sh -s'"
     ]
